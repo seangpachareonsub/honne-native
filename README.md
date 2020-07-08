@@ -1,2 +1,2 @@
-# honne-native
-Native mobile application of Honne dating app
+# Honne (Native mobile IOS/Android app)
+React Native mobile application of Honne dating app
