@@ -23,6 +23,9 @@ export default function SignUpScreen({ navigation }) {
 
   const handleSignUp = () => {
     console.log(registerDetails)
+    axios.post('http://127.0.0.1:8000/api/register', registerDetails)
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err))
   }
 
   return (
@@ -40,10 +43,10 @@ export default function SignUpScreen({ navigation }) {
           placeholderTextColor='#7d7d7d'  placeholder='Email' />
 
         <TextInput style={styles.input} onChangeText={text => handleForm(text, 'password')} 
-          placeholderTextColor='#7d7d7d' placeholder='Password' secureTextEntry={true} />
+          placeholderTextColor='#7d7d7d' placeholder='Password' clearTextOnFocus={false} secureTextEntry={true} />
 
         <TextInput style={styles.input} onChangeText={text => handleForm(text, 'password_confirmation')} 
-          placeholderTextColor='#7d7d7d' placeholder='Password confirmation' secureTextEntry={true} />
+          placeholderTextColor='#7d7d7d' placeholder='Password confirmation' clearTextOnFocus={false} secureTextEntry={true} />
 
         <TouchableOpacity onPress={handleSignUp} activeOpacity={0.7} style={styles.button}>
           <Text style={styles.buttonText}> CONTINUE </Text>

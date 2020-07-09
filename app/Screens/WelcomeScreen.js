@@ -1,7 +1,12 @@
-import React from 'react'
-import { StyleSheet, Text, View, SafeAreaView, TouchableHighlight, Dimensions, ImageBackground, TouchableOpacity } from 'react-native'
+import React, { useEffect } from 'react'
+import { StyleSheet, Text, View, SafeAreaView, AsyncStorage, Dimensions, ImageBackground, TouchableOpacity } from 'react-native'
+
+import jwt from 'react-native-pure-jwt'
 
 export default function WelcomeScreen({ navigation }) {
+
+
+
 
   return (
     <ImageBackground style={styles.image} blurRadius={dimension > 2.75 ? 12 : 2} source={{ uri: 'https://images.unsplash.com/photo-1586073055431-5b31161642f7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2734&q=80' }}>

@@ -40,7 +40,7 @@ export default function DrawerContent(props) {
       </Drawer.Section>
 
       <Drawer.Section>
-        <DrawerItem label='Sign Out'
+        <DrawerItem label='Sign Out' onPress={() => navigation.navigate('Signup')}
           icon={(color, size) => <Icon name='exit-to-app' color='black' size={30} />} />
       </Drawer.Section>
     </View>

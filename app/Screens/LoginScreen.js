@@ -1,13 +1,31 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, View, SafeAreaView, TouchableHighlight, Dimensions, Platform, StatusBar, TextInput, Button } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { AsyncStorage, StyleSheet, Text, View, SafeAreaView, TouchableHighlight, Dimensions, Platform, StatusBar, TextInput, Button } from 'react-native'
 import { TouchableWithoutFeedback, TouchableOpacity } from 'react-native-gesture-handler'
+
+import axios from 'axios'
 
 export default function LoginScreen({ navigation }) {
 
-  const [loginDetails, setLoginDetails] = useState({
-    email: '',
-    password: ''
-  })
+  const [jsonToken, setJSONToken] = useState()
+
+  const setToken = async (token) => {
+    try {
+      await AsyncStorage.setItem('token', token)
+    } catch (e) {
+      alert(e)
+    }
+  }
+
+  const getToken = async() => {
+    try {
+      const token = await AsyncStorage.getItem('token')
+      if (token) setJSONToken(token)
+    } catch (e) {
+      alert(e)
+    }
+  }
+
+  const [loginDetails, setLoginDetails] = useState({ email: '', password: '' })
 
   const handleForm = (text, name) => {
     const credentials = { ...loginDetails, [name]: text }
@@ -15,11 +33,13 @@ export default function LoginScreen({ navigation }) {
   }
 
   const handleLogin = () => {
-    console.log(loginDetails)
-    // axios.post('http://127.0.0.1:8000/api/register', loginDetails)
-    //   .then(res => console.log(res.data))
-    //   .catch(err => console.log(err))
-   
+    axios.post('http://127.0.0.1:8000/api/login', loginDetails)
+      .then(res => {
+        // console.log(res.data.token)
+        // navigation.navigate('Profile')
+        setToken(res.data.token)
+      })
+      .catch(err => console.log(err))
   }
 
   return (
@@ -27,15 +47,17 @@ export default function LoginScreen({ navigation }) {
 
       <Text style={styles.title}> LOGIN </Text>
 
+      <Text> this is token = {jsonToken} </Text>
+
       <View style={[styles.subContainer, { height: '60%' }]}>
-        <TextInput onChangeText={text => handleForm(text, 'email')} 
+        <TextInput onChangeText={text => handleForm(text, 'email')}
           style={styles.input} placeholderTextColor='#7d7d7d' placeholder='Email' />
 
 
         <TextInput style={[styles.input, { top: -20 }]} onChangeText={text => handleForm(text, 'password')}
-          secureTextEntry={true} placeholderTextColor='#7d7d7d' placeholder='Password' />
+          secureTextEntry={true} placeholderTextColor='#7d7d7d' clearTextOnFocus={false} placeholder='Password' />
 
-        <TouchableOpacity  onPress={() => navigation.navigate('Profile')} activeOpacity={0.7} style={styles.button}>
+        <TouchableOpacity onPress={handleLogin} activeOpacity={0.7} style={styles.button}>
           <Text style={styles.buttonText}> LOGIN </Text>
         </TouchableOpacity>
 

@@ -1,5 +1,6 @@
 import 'react-native-gesture-handler'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { AsyncStorage } from 'react-native'
 import { PoiretOne_400Regular } from '@expo-google-fonts/poiret-one'
 import { OpenSans_300Light } from '@expo-google-fonts/open-sans'
 import { useFonts, OpenSansCondensed_300Light, OpenSansCondensed_700Bold } from '@expo-google-fonts/open-sans-condensed'
@@ -25,6 +26,8 @@ import DrawerContent from './app/Screens/DrawerContent'
 import SettingTabContent from './app/Screens/SettingTabContent'
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+
+import jwt from 'react-native-pure-jwt'
 
 
 function ProfileNavigation({ navigation }) {
@@ -74,6 +77,33 @@ function DrawerNavigation() {
 }
 
 export default function App() {
+
+  useEffect(() => {
+    console.log(isLoggedIn())
+  }, [])
+
+
+  const secret = '2ah73h^5zk2qd^)kyb8$0&md*x0j#59hv3bwt$63e5pu99f&wa'
+
+  const isLoggedIn = async () => {
+
+    const token = await AsyncStorage.getItem('token')
+    if (token) {
+      jwt.verify(token, secret, function (err, decoded) {
+        if (err) AsyncStorage.removeItem('token')
+      })
+    }
+    return token
+  }
+
+
+
+
+
+
+
+
+
 
   const Stack = createStackNavigator()
 
