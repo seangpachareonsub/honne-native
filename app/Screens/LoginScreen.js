@@ -1,31 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { AsyncStorage, StyleSheet, Text, View, SafeAreaView, TouchableHighlight, Dimensions, Platform, StatusBar, TextInput, Button } from 'react-native'
 import { TouchableWithoutFeedback, TouchableOpacity } from 'react-native-gesture-handler'
-
 import axios from 'axios'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+
+import { AuthContext } from '../lib/context'
+
 
 export default function LoginScreen({ navigation }) {
 
-  const [jsonToken, setJSONToken] = useState()
-
-  const setToken = async (token) => {
-    try {
-      await AsyncStorage.setItem('token', token)
-    } catch (e) {
-      alert(e)
-    }
-  }
-
-  const getToken = async() => {
-    try {
-      const token = await AsyncStorage.getItem('token')
-      if (token) setJSONToken(token)
-    } catch (e) {
-      alert(e)
-    }
-  }
-
   const [loginDetails, setLoginDetails] = useState({ email: '', password: '' })
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const { logIn } = useContext(AuthContext)
+
+
+
+  const handleSecureText = () => {
+    setPasswordVisible(!passwordVisible)
+  }
 
   const handleForm = (text, name) => {
     const credentials = { ...loginDetails, [name]: text }
@@ -35,11 +27,19 @@ export default function LoginScreen({ navigation }) {
   const handleLogin = () => {
     axios.post('http://127.0.0.1:8000/api/login', loginDetails)
       .then(res => {
-        // console.log(res.data.token)
-        // navigation.navigate('Profile')
+        // console.log(res.data)
         setToken(res.data.token)
+        logIn()
       })
       .catch(err => console.log(err))
+  }
+
+  const setToken = async (token) => {
+    try {
+      await AsyncStorage.setItem('token', token)
+    } catch (e) {
+      alert(e)
+    }
   }
 
   return (
@@ -47,15 +47,19 @@ export default function LoginScreen({ navigation }) {
 
       <Text style={styles.title}> LOGIN </Text>
 
-      <Text> this is token = {jsonToken} </Text>
-
       <View style={[styles.subContainer, { height: '60%' }]}>
-        <TextInput onChangeText={text => handleForm(text, 'email')}
+        <TextInput onChangeText={text => handleForm(text, 'email')} autoCapitalize='none'
           style={styles.input} placeholderTextColor='#7d7d7d' placeholder='Email' />
 
 
-        <TextInput style={[styles.input, { top: -20 }]} onChangeText={text => handleForm(text, 'password')}
-          secureTextEntry={true} placeholderTextColor='#7d7d7d' clearTextOnFocus={false} placeholder='Password' />
+        <View style={{ flexDirection: 'row' }}>
+
+          <TextInput style={[styles.input, { top: -20 }]} onChangeText={text => handleForm(text, 'password')} 
+            secureTextEntry={!passwordVisible} placeholderTextColor='#7d7d7d' clearTextOnFocus={false} placeholder='Password' />
+          <Icon style={{ position: 'absolute', right: 0, bottom: 27 }} name={passwordVisible ? 'eye-outline' : 'eye-off-outline'}
+            color='#6d6d6d' onPress={handleSecureText} size={27} />
+        </View>
+
 
         <TouchableOpacity onPress={handleLogin} activeOpacity={0.7} style={styles.button}>
           <Text style={styles.buttonText}> LOGIN </Text>

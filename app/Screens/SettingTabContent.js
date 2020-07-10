@@ -4,8 +4,6 @@ import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
-import { Animated } from 'react-native-reanimated'
-
 export default function SettingTabContent({ state, descriptors, navigation, position }) {
 
   return (

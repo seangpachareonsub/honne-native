@@ -1,12 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View, SafeAreaView, AsyncStorage, Dimensions, ImageBackground, TouchableOpacity } from 'react-native'
-
-import jwt from 'react-native-pure-jwt'
+import { useSafeArea } from 'react-native-safe-area-context'
 
 export default function WelcomeScreen({ navigation }) {
-
-
-
 
   return (
     <ImageBackground style={styles.image} blurRadius={dimension > 2.75 ? 12 : 2} source={{ uri: 'https://images.unsplash.com/photo-1586073055431-5b31161642f7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2734&q=80' }}>
@@ -16,8 +12,6 @@ export default function WelcomeScreen({ navigation }) {
           <Text style={styles.subtitle}> 本音 </Text>
           <Text style={styles.title}> HONNE </Text>
         </View>
-
-
 
 
         <View style={{ bottom: -40 }}>

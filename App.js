@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState, useMemo, useContext } from 'react'
 import { AsyncStorage } from 'react-native'
 import { PoiretOne_400Regular } from '@expo-google-fonts/poiret-one'
 import { OpenSans_300Light } from '@expo-google-fonts/open-sans'
@@ -13,7 +13,6 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import WelcomeScreen from './app/Screens/WelcomeScreen'
 import LoginScreen from './app/Screens/LoginScreen'
 import SignUpScreen from './app/Screens/SignUpScreen'
-import ProfileScreen from './app/Screens/ProfileScreen'
 import MessageScreen from './app/Screens/MessageScreen'
 import SwipeScreen from './app/Screens/SwipeScreen'
 import DiscoverySettingScreen from './app/Screens/DiscoverySettingScreen'
@@ -24,86 +23,51 @@ import ImageProfileScreen from './app/Screens/ImageProfileScreen'
 import Header from './app/Screens/Header'
 import DrawerContent from './app/Screens/DrawerContent'
 import SettingTabContent from './app/Screens/SettingTabContent'
-
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import base64, { decode, encode } from 'react-native-base64'
+import axios from 'axios'
 
-import jwt from 'react-native-pure-jwt'
-
-
-function ProfileNavigation({ navigation }) {
-
-  const Tab = createMaterialTopTabNavigator()
-
-  return (
-    <>
-      <Header navigation={navigation} />
-      {/* <Tab.Navigator tabBar={props => <SettingTabContent {...props} />}> */}
-      <Tab.Navigator>
-        <Tab.Screen name="Bio" component={BioProfileScreen}/>
-        <Tab.Screen name="Images" component={ImageProfileScreen} />
-      </Tab.Navigator>
-    </>
-  )
-}
-
-
-function SettingNavigation({ navigation }) {
-  const Tab = createMaterialTopTabNavigator()
-
-  return (
-    <>
-      <Header navigation={navigation} />
-      {/* <Tab.Navigator tabBar={props => <SettingTabContent {...props} />}> */}
-      <Tab.Navigator>
-        <Tab.Screen name="Discovery" component={DiscoverySettingScreen}/>
-        <Tab.Screen name="Questions" component={QuestionSettingScreen} />
-      </Tab.Navigator>
-    </>
-  )
-}
-
-function DrawerNavigation() {
-
-  const Drawer = createDrawerNavigator()
-
-  return (
-    <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />} screenOptions={{ headerShown: false }} >
-      <Drawer.Screen name="Swipe" component={SwipeScreen} />
-      <Drawer.Screen name="Messages" component={MessageScreen} />
-      <Drawer.Screen name="Profile" component={ProfileNavigation} />
-      <Drawer.Screen name="Setting" component={SettingNavigation} />
-    </Drawer.Navigator>
-  )
-}
+import { AuthContext } from './app/lib/context'
 
 export default function App() {
 
-  useEffect(() => {
-    console.log(isLoggedIn())
-  }, [])
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [userID, setUserID] = useState()
 
-
-  const secret = '2ah73h^5zk2qd^)kyb8$0&md*x0j#59hv3bwt$63e5pu99f&wa'
-
-  const isLoggedIn = async () => {
-
-    const token = await AsyncStorage.getItem('token')
-    if (token) {
-      jwt.verify(token, secret, function (err, decoded) {
-        if (err) AsyncStorage.removeItem('token')
-      })
+  const authContext = useMemo(() => ({
+    logIn: () => {
+      setLoggedIn(true)
+    },
+    logOut: () => {
+      AsyncStorage.removeItem('token')
+      setLoggedIn(false)
+    },
+    getUserId: () => {
+      const token = AsyncStorage.getItem('token')
+      const parts = token.split('.')
+      console.log(base64.decode(parts[1]) +  ' hellooo')
     }
-    return token
-  }
+  }))
+
+ 
 
 
+  // const getToken = async () => {
+  //   try {
+  //     const token = await AsyncStorage.getItem('token')
+  //     if (token) {
+  //       return token
+  //     }
+  //   } catch (e) {
+  //     alert(e)
+  //   }
+  // }
 
-
-
-
-
-
-
+  // const getUserId = (token) => {
+  //   const parts = token.split('.')
+  //   console.log(base64.decode(parts[1]))
+  //   setLoggedIn(true)
+  // }
 
   const Stack = createStackNavigator()
 
@@ -115,20 +79,84 @@ export default function App() {
 
   })
 
+
+  // PROFILE TOP TAB NAVIGATION STACK
+
+  function ProfileNavigation({ navigation }) {
+
+    const Tab = createMaterialTopTabNavigator()
+
+    return (
+      <>
+        <Header navigation={navigation} />
+        {/* <Tab.Navigator tabBar={props => <SettingTabContent {...props} />}> */}
+        <Tab.Navigator>
+          <Tab.Screen name="Bio" component={BioProfileScreen} />
+          <Tab.Screen name="Images" component={ImageProfileScreen} />
+        </Tab.Navigator>
+      </>
+    )
+  }
+
+
+  // SETTING TOP TAB NAVIGATION STACK
+
+  function SettingNavigation({ navigation }) {
+    const Tab = createMaterialTopTabNavigator()
+
+    return (
+      <>
+        <Header navigation={navigation} />
+        {/* <Tab.Navigator tabBar={props => <SettingTabContent {...props} />}> */}
+        <Tab.Navigator>
+          <Tab.Screen name="Discovery" component={DiscoverySettingScreen} />
+          <Tab.Screen name="Questions" component={QuestionSettingScreen} />
+        </Tab.Navigator>
+      </>
+    )
+  }
+
+  // MENU DRAWER NAVIGATION STACK
+
+  function DrawerNavigation() {
+
+    const Drawer = createDrawerNavigator()
+
+    return (
+      <Drawer.Navigator drawerContent={props => <DrawerContent setLoggedIn={() => setLoggedIn()} {...props} />}
+        screenOptions={{ headerShown: false }} >
+        <Drawer.Screen name="Swipe" component={SwipeScreen} />
+        <Drawer.Screen name="Messages" component={MessageScreen} />
+        <Drawer.Screen name="Profile" component={ProfileNavigation} />
+        <Drawer.Screen name="Setting" component={SettingNavigation} />
+      </Drawer.Navigator>
+    )
+  }
+
+  // MAIN NAVIGATION STACK
+
   if (!fontsLoaded) {
     return <AppLoading />
   } else {
     return (
 
-      <NavigationContainer >
-        <Stack.Navigator screenOptions={{ headerShown: false }} >
-          <Stack.Screen name="Home" component={WelcomeScreen} />
-          <Stack.Screen name='Signup' component={SignUpScreen} />
-          <Stack.Screen name='Login' component={LoginScreen} />
-          <Stack.Screen name="Profile" component={DrawerNavigation} />
-        </Stack.Navigator>
+      <AuthContext.Provider value={authContext}>
+        <NavigationContainer >
+          <Stack.Navigator screenOptions={{ headerShown: false }} >
 
-      </NavigationContainer>
+            {!loggedIn ?
+              <>
+                <Stack.Screen name="Home" component={WelcomeScreen} />
+                <Stack.Screen name='Signup' component={SignUpScreen} />
+                <Stack.Screen name='Login' component={LoginScreen} />
+              </>
+              : <Stack.Screen name="Profile" component={DrawerNavigation} />
+            }
+
+          </Stack.Navigator>
+        </NavigationContainer>
+      </AuthContext.Provider>
+
 
     )
   }

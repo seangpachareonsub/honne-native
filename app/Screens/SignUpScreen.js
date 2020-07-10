@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, SafeAreaView, TouchableHighlight, Dimensions, P
 import { TouchableWithoutFeedback, TouchableOpacity } from 'react-native-gesture-handler'
 import axios from 'axios'
 
-import { Input } from 'react-native-elements'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 
 export default function SignUpScreen({ navigation }) {
 
@@ -14,6 +14,8 @@ export default function SignUpScreen({ navigation }) {
     password_confirmation: ''
   })
 
+  const [passwordVisible, setPasswordVisible] = useState(false)
+  const [passwordConfirmationVisible, setPasswordConfirmationVisible] = useState(false)
 
 
   const handleForm = (text, name) => {
@@ -36,25 +38,35 @@ export default function SignUpScreen({ navigation }) {
 
       <View style={[styles.subContainer, { height: '60%' }]}>
 
-        <TextInput style={styles.input} onChangeText={text => handleForm(text, 'first_name')} 
+        <TextInput style={styles.input} onChangeText={text => handleForm(text, 'first_name')}
           placeholderTextColor='#7d7d7d' placeholder='First name' />
 
-        <TextInput style={styles.input} onChangeText={text => handleForm(text, 'email')} 
-          placeholderTextColor='#7d7d7d'  placeholder='Email' />
+        <TextInput style={styles.input} onChangeText={text => handleForm(text, 'email')}
+          placeholderTextColor='#7d7d7d' placeholder='Email' />
 
-        <TextInput style={styles.input} onChangeText={text => handleForm(text, 'password')} 
-          placeholderTextColor='#7d7d7d' placeholder='Password' clearTextOnFocus={false} secureTextEntry={true} />
+        <View style={{ flexDirection: 'row' }}>
+          <TextInput style={styles.input} onChangeText={text => handleForm(text, 'password')}
+            placeholderTextColor='#7d7d7d' placeholder='Password' clearTextOnFocus={false} secureTextEntry={!passwordVisible} />
+          <Icon style={{ position: 'absolute', right: 0, bottom: 47 }}
+            name={passwordVisible ? 'eye-outline' : 'eye-off-outline'}
+            color='#6d6d6d' onPress={() => setPasswordVisible(!passwordVisible)} size={27} />
+        </View>
 
-        <TextInput style={styles.input} onChangeText={text => handleForm(text, 'password_confirmation')} 
-          placeholderTextColor='#7d7d7d' placeholder='Password confirmation' clearTextOnFocus={false} secureTextEntry={true} />
+        <View style={{ flexDirection: 'row' }}>
+          <TextInput style={styles.input} onChangeText={text => handleForm(text, 'password_confirmation')}
+            placeholderTextColor='#7d7d7d' placeholder='Password confirmation' clearTextOnFocus={false} secureTextEntry={!passwordConfirmationVisible} />
+          <Icon style={{ position: 'absolute', right: 0, bottom: 47 }}
+            name={passwordConfirmationVisible ? 'eye-outline' : 'eye-off-outline'}
+            color='#6d6d6d' onPress={() => setPasswordConfirmationVisible(!passwordConfirmationVisible)} size={27} />
+        </View>
 
         <TouchableOpacity onPress={handleSignUp} activeOpacity={0.7} style={styles.button}>
           <Text style={styles.buttonText}> CONTINUE </Text>
         </TouchableOpacity>
-        
+
       </View>
 
-      <Text onPress={() => navigation.navigate('Login')}  style={styles.signUp}> Already have an account? Login </Text>
+      <Text onPress={() => navigation.navigate('Login')} style={styles.signUp}> Already have an account? Login </Text>
 
     </SafeAreaView>
   )
@@ -103,7 +115,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: dimension > 2.75 ? 16 : 18, 
+    fontSize: dimension > 2.75 ? 16 : 18,
     fontFamily: 'OpenSansCondensed_700Bold',
     letterSpacing: 1
   },
